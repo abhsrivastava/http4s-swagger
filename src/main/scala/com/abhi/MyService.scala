@@ -1,22 +1,24 @@
 package com.abhi
 
-// cats imports
+import cats.Applicative
 import cats.effect.Effect
-import cats.Monad
-
-// api imports
 import org.http4s.rho.RhoService
-
-// swagger imports
 import org.http4s.rho.swagger.SwaggerSyntax
+import org.http4s.Uri
+import scala.concurrent.ExecutionContext
+import shapeless._
+import cats.implicits._
 
-// json imports
-import org.json4s.DefaultFormats
-import org.json4s.jackson.JsonMethods
 
-abstract class MyService[F[+_]: Effect](swaggerSyntax: SwaggerSyntax[F])(implicit f: Monad[F]) extends RhoService[F] { 
-  
-  GET / "hello" / pathVar[String] |>> { name: String =>
-    Ok(s"Hello $name")
+object HelloService {
+  def helloRoute[F[_]](implicit F: Effect[F], ec: ExecutionContext) : RhoService[F] = {
+    val swaggerSyntax = new SwaggerSyntax[F] {}
+    import swaggerSyntax._
+    new RhoService[F]{
+      "This is hello API" ** 
+      GET / "hello" / pathVar[String]("name") |>> { name: String => 
+        Ok(ResponseMessage(s"Hello $name"))
+      }
+    }
   }
 }

@@ -11,24 +11,20 @@ import org.http4s.server.blaze.BlazeBuilder
 import org.http4s.HttpService
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.http4s.rho.swagger.syntax.io._
-
+import org.http4s.server.middleware.CORS
 import org.http4s.rho.swagger.syntax.{io => ioSwagger}
 
 object Main extends StreamApp[IO] {
   private val logger = getLogger
-  val port : Int = Option(System.getenv("HTTP_PORT"))
-    .map(_.toInt)
-    .getOrElse(8080)
-  
-  logger.info(s"Starting server at port: $port")
-
+  logger.info(s"Starting server.....")
   def stream(args: List[String], requestShutdown: IO[Unit]) : Stream[IO, ExitCode] = {
+    val rhoService = HelloService.helloRoute[IO]
     val middleware = createRhoMiddleware()
-    val myService: HttpService[IO] = new MyService[IO](ioSwagger) {}.toService(middleware)
+    val service = CORS(rhoService.toService(middleware))
     BlazeBuilder[IO]
-      .mountService(StaticContentService.routes combineK myService)
-      .bindLocal(port)
-      .serve    
+      .bindHttp(8080, "0.0.0.0")
+      .mountService(service, "/")
+      .serve
   }
 }
 

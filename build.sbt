@@ -9,6 +9,8 @@ val prj = (project in file(".")).
       "org.http4s" %% "http4s-core" % "0.18.7",
       "org.http4s" %% "rho-swagger" % "0.18.0",
       "org.http4s" %% "http4s-dsl" % "0.18.7",
-      "org.http4s" %% "http4s-blaze-server" % "0.18.7"
+      "org.http4s" %% "http4s-blaze-server" % "0.18.7",
+      "org.http4s" %% "http4s-circe" % "0.18.7",
+      "io.circe" %% "circe-generic" % "0.9.2"
     )
   )
